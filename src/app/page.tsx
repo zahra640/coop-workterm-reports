@@ -1,69 +1,216 @@
+"use client";
+
+import { useLayoutEffect, useRef, useState } from "react";
+import Link from "next/link";
 import Image from "next/image";
+import { terms, graduation, type Term } from "@/data/terms";
+import styles from "./page.module.css";
+
+//helper to join class names conditionally
+const cx = (...c: (string | false | undefined)[]) => c.filter(Boolean).join(" ");
+
+// Term.state -> CSS Module key. Kept explicit so a renamed state fails loudly
+// in TypeScript instead of silently resolving to `undefined` at runtime.
+const stateClass: Record<Term["state"], string> = {
+    Done: styles.done,
+    Current: styles.current,
+    Future: styles.future,
+};
+
+// Term.status -> optional colour modifier for the status line.
+const statusClass: Record<Term["status"], string | undefined> = {
+    Completed: undefined,
+    "In Progress": undefined,
+    Upcoming: styles.up,
+};
+
+// `badge` carries either a public-path logo ("/logos/x.png") or a short literal
+// to typeset ("-" for terms whose employer isn't known yet).
+const isLogo = (badge: string) => badge.startsWith("/");
+
+function BadgeContent({ term }: { term: Term }) {
+    if (isLogo(term.badge)) {
+        return (
+            <Image
+                src={term.badge}
+                alt={`${term.company} logo`}
+                width={64}
+                height={64}
+            />
+        );
+    }
+    return <>{term.badge}</>;
+}
 
 export default function Home() {
-  return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
-  );
+    const [selected, setSelected] = useState(0);
+    const trackRef = useRef<HTMLDivElement>(null);
+
+    const [rail, setRail] = useState({left: 0, width: 0, top: 0});
+    const [fill, setFill] = useState({left: 0, width: 0, top: 0});
+
+    useLayoutEffect(() => {
+        const measure = () => {
+            const track = trackRef.current;
+            if (!track) return;
+            const bullets = track.querySelectorAll<HTMLElement>("[data-bullet]");
+            if (!bullets.length) return;
+
+            // Measure against .trackH itself — the rail is positioned against it,
+            // while offsetLeft/offsetTop would resolve against .nodes and land
+            // one padding-box off.
+            const base = track.getBoundingClientRect();
+            const centerOf = (el: HTMLElement) => {
+                const r = el.getBoundingClientRect();
+                return {
+                    x: r.left - base.left + r.width / 2,
+                    y: r.top - base.top + r.height / 2,
+                };
+            };
+
+            const first = centerOf(bullets[0]);
+            const last = centerOf(bullets[bullets.length - 1]);
+
+            const lastDone = terms.reduce(
+                (acc, t, i) => (t.state === "Done" ? i : acc),
+                0
+            );
+            const doneX = centerOf(bullets[lastDone]).x;
+            const nextEl = bullets[lastDone + 1];
+            const nextX = nextEl ? centerOf(nextEl).x : doneX;
+            const progX = doneX + (nextX - doneX) * 0.5;
+
+            setRail({left: first.x, width: last.x - first.x, top: first.y - 1});
+            setFill({left: first.x, width: progX - first.x, top: first.y - 1});
+        };
+
+        measure();
+
+        // Web fonts change label widths, which moves the bullets — re-measure
+        // once they land, and on any later resize of the track.
+        document.fonts?.ready.then(measure);
+        const ro = new ResizeObserver(measure);
+        if (trackRef.current) ro.observe(trackRef.current);
+        window.addEventListener("resize", measure);
+        return () => {
+            ro.disconnect();
+            window.removeEventListener("resize", measure);
+        };
+    }, []);
+
+    const term = terms[selected];
+
+    return (
+        <main className={styles.page}>
+            <div className={styles.wrap}>
+                <p className={cx(styles.eyebrow, styles.anim, styles.d1)}>
+                    Software Engineering Co-op @ University of Guelph
+                </p>
+                <h1 className={cx(styles.heroH1, styles.anim, styles.d2)}>
+                    Zahra Hussain - Co-op Workterm Reports
+                </h1>
+            </div>
+
+            <div className={styles.wrap}>
+                <div className={cx(styles.trackScroll, styles.anim, styles.d4)}>
+                    <div className={styles.trackH} ref={trackRef}>
+                        <div
+                            className={styles.rail}
+                            style={{ left: rail.left, width: rail.width, top: rail.top }}
+                        />
+                        <div
+                            className={styles.railFill}
+                            style={{ left: fill.left, width: fill.width, top: fill.top }}
+                        />
+                        <div className={styles.nodes}>
+                            {terms.map((t, i) => (
+                                <button
+                                    key={t.slug}
+                                    type="button"
+                                    className={cx(
+                                        styles.node,
+                                        stateClass[t.state],
+                                        i === selected && styles.active
+                                    )}
+                                    style={{ animationDelay: `${0.3 + i * 0.09}s` }}
+                                    onClick={() => setSelected(i)}
+                                >
+                                    <span className={styles.bullet} data-bullet>
+                                        <i />
+                                    </span>
+                                    <span className={styles.lab}>
+                                        <span className={styles.code}>{t.code}</span>
+                                        <span className={styles.rng}>{t.range}</span>
+                                    </span>
+                                </button>
+                            ))}
+                            <div
+                                className={cx(styles.node, styles.grad)}
+                                style={{ animationDelay: `${0.3 + terms.length * 0.09}s` }}
+                            >
+                                <span className={styles.bullet} data-bullet>
+                                    <i />
+                                </span>
+                                <span className={styles.lab}>
+                                    <span className={styles.code}>{graduation.code}</span>
+                                    <span className={styles.rng}>{graduation.range}</span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* detail panel — reacts to the selected node */}
+                <div className={styles.detail} key={selected}>
+                    <div
+                        className={cx(
+                            styles.dBadge,
+                            isLogo(term.badge)
+                                ? styles.hasLogo
+                                : !term.published && styles.muted
+                        )}
+                    >
+                        <BadgeContent term={term} />
+                    </div>
+                    <div className={styles.dMain}>
+                        <div className={cx(styles.dStatus, statusClass[term.status])}>
+                            {term.status}
+                        </div>
+                        <h2>{term.company}</h2>
+                        <div className={styles.dMeta}>
+                            {term.code} · {term.range}
+                        </div>
+                        {term.published ? (
+                            <>
+                                <p className={styles.dRole}>{term.role}</p>
+                                <div className={styles.dTags}>
+                                    {term.tags?.map((tag) => (
+                                        <span key={tag}>{tag}</span>
+                                    ))}
+                                </div>
+                            </>
+                        ) : (
+                            <p className={styles.dEmpty}>{term.empty}</p>
+                        )}
+                    </div>
+                    {term.published && (
+                        <div className={styles.dActions}>
+                            <Link
+                                href={`/reports/${term.slug}`}
+                                className={cx(styles.btn, styles.btnPrimary)}
+                            >
+                                Read report
+                            </Link>
+                            <button
+                                type="button"
+                                className={cx(styles.btn, styles.btnGhost)}
+                            >
+                                Download PDF
+                            </button>
+                        </div>
+                    )}
+                </div>
+            </div>
+        </main>
+    );
 }
