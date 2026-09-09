@@ -2,7 +2,7 @@
    Page-specific styles for the index / horizontal track.
    Scoped to this page — reference in JSX as styles.className. */
 
-.page { padding: 54px 0 80px; }
+.page { padding: 24px 0 80px; }
 
 .wrap { max-width: 1080px; margin: 0 auto; padding: 0 34px; }
 
@@ -16,7 +16,7 @@
 
 /* ---------- hero ---------- */
 .eyebrow {
-    font-family: var(--disp);
+    font-family: var(--disp), serif;
     font-style: italic;
     font-size: 19px;
     color: var(--pine);
@@ -122,7 +122,7 @@
 .lab { display: block; width: 100%; }
 .lab .code {
     display: block;
-    font-family: var(--disp);
+    font-family: var(--disp), serif;
     font-weight: 600;
     font-size: 18px;
     line-height: 1.2;
@@ -139,14 +139,6 @@
 .future .code { color: var(--faint); }
 .node:hover .code { color: var(--pine); }
 .future:hover .code { color: var(--soft); }
-
-/* Graduation node carries much longer copy — let it wrap instead of
-   stretching the whole track and forcing a horizontal scrollbar. */
-.grad { cursor: default; }
-.grad .bullet { border-color: var(--amber); border-style: dashed; }
-.grad .bullet i { background: var(--amber); }
-.grad .code { font-style: italic; color: var(--amber); font-size: 16px; white-space: normal; }
-.grad .rng { white-space: normal; max-width: 22ch; margin-inline: auto; }
 
 /* ---------- detail panel ---------- */
 @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
@@ -171,7 +163,7 @@
     background: var(--pine);
     color: #fff;
     display: flex; align-items: center; justify-content: center;
-    font-family: var(--disp); font-weight: 600; font-size: 23px;
+    font-family: var(--disp), serif; font-weight: 600; font-size: 23px;
     line-height: 1;
     letter-spacing: .01em;
     overflow: hidden;
@@ -187,17 +179,17 @@
 .dStatus { font-size: 13px; font-weight: 600; color: var(--pine); margin-bottom: 6px; }
 .dStatus.up { color: var(--amber); }
 .detail h2 { font-size: 32px; margin-bottom: 6px; }
-.dMeta { color: var(--soft); font-size: 14.5px; margin-bottom: 14px; }
-.dRole { font-size: 16.5px; color: var(--ink); max-width: 52ch; margin: 0; }
+.dMeta { color: var(--soft); font-size: 14px; margin-bottom: 14px; }
+.dRole { font-size: 16px; color: var(--ink); max-width: 52ch; margin: 0; }
 .dTags { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
 .dTags span {
-    font-size: 12.5px; font-weight: 600;
+    font-size: 12px; font-weight: 600;
     color: var(--pine); background: var(--pine-t);
     padding: 5px 12px; border-radius: 999px;
 }
 .dEmpty {
     color: var(--soft); font-style: italic;
-    font-family: var(--disp); font-size: 17px; line-height: 1.5; max-width: 48ch;
+    font-family: var(--disp), serif; font-size: 17px; line-height: 1.5; max-width: 48ch;
     margin: 0;
 }
 .dActions { display: flex; flex-direction: column; gap: 10px; align-self: center; }

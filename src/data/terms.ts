@@ -50,19 +50,24 @@ export const terms: Term[] = [
         empty: "Not written yet. This report goes up within two weeks of the workterm ending.",
     },
     {
-        slug: "Summer-2027",
-        code: "S27",
-        range: "May-Aug 2027",
+        slug: "Winter-2028",
+        code: "W28",
+        range: "Jan-Apr 2028",
         badge: "-",
         company: "Workterm 04",
         status: "Upcoming",
         state: "Future",
         empty: "Not written yet. This report goes up within two weeks of the workterm ending.",
     },
+    {
+        slug: "Summer-2028",
+        code: "S28",
+        range: "May-Aug 2028",
+        badge: "-",
+        company: "Workterm 05",
+        status: "Upcoming",
+        state: "Future",
+        empty: "Not written yet. This report goes up within two weeks of the workterm ending.",
+    },
 ];
-
-export const graduation = {
-    code: "Graduating April 2029",
-    range: "Software Engineering with an Area of Emphasis in Artificial Intelligence",
-}
 

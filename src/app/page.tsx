@@ -3,7 +3,7 @@
 import { useLayoutEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { terms, graduation, type Term } from "@/data/terms";
+import { terms, type Term } from "@/data/terms";
 import styles from "./page.module.css";
 
 //helper to join class names conditionally
@@ -71,17 +71,20 @@ export default function Home() {
             const first = centerOf(bullets[0]);
             const last = centerOf(bullets[bullets.length - 1]);
 
+            // The green fill ends on the last completed term's bullet — it only
+            // advances when a term is actually marked Done, never part-way.
             const lastDone = terms.reduce(
                 (acc, t, i) => (t.state === "Done" ? i : acc),
-                0
+                -1
             );
-            const doneX = centerOf(bullets[lastDone]).x;
-            const nextEl = bullets[lastDone + 1];
-            const nextX = nextEl ? centerOf(nextEl).x : doneX;
-            const progX = doneX + (nextX - doneX) * 0.5;
+            const doneX = lastDone >= 0 ? centerOf(bullets[lastDone]).x : first.x;
 
             setRail({left: first.x, width: last.x - first.x, top: first.y - 1});
-            setFill({left: first.x, width: progX - first.x, top: first.y - 1});
+            setFill({
+                left: first.x,
+                width: Math.max(0, doneX - first.x),
+                top: first.y - 1,
+            });
         };
 
         measure();
@@ -144,18 +147,6 @@ export default function Home() {
                                     </span>
                                 </button>
                             ))}
-                            <div
-                                className={cx(styles.node, styles.grad)}
-                                style={{ animationDelay: `${0.3 + terms.length * 0.09}s` }}
-                            >
-                                <span className={styles.bullet} data-bullet>
-                                    <i />
-                                </span>
-                                <span className={styles.lab}>
-                                    <span className={styles.code}>{graduation.code}</span>
-                                    <span className={styles.rng}>{graduation.range}</span>
-                                </span>
-                            </div>
                         </div>
                     </div>
                 </div>
