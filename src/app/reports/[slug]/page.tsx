@@ -10,10 +10,8 @@ export function generateStaticParams() {
 
 export default async function ReportPage({
                                              params,
-                                         }: {
-    params: Promise<{ slug: string }>;
-}) {
-    const { slug } = await params; // params is a promise in current Next.js
+                                         }: PageProps<"/reports/[slug]">) {
+    const { slug } = await params;
     const term = terms.find((t) => t.slug === slug);
 
     if (!term) notFound(); // unknown slug → 404

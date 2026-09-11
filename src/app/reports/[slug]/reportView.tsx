@@ -2,18 +2,14 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
-import type { Term } from "@/data/terms";
+import { termStatus, PLACEHOLDER, type Term } from "@/data/terms";
 import { getReport } from "@/data/reports";
 import type { Goal } from "@/data/reports/types";
+import { BadgeContent } from "@/components/badge";
 import styles from "./report.module.css";
 
 const cx = (...c: (string | false | null | undefined)[]) =>
     c.filter(Boolean).join(" ");
-
-// `badge` holds either a public-path logo ("/logos/x.png") or a short literal
-// to typeset ("-" for terms whose employer isn't known yet).
-const isLogo = (badge: string) => badge.startsWith("/");
 
 // Section numbers and anchor ids come from array order, so a report's content
 // file never has to keep its own numbering in sync.
@@ -23,6 +19,7 @@ const anchorId = (i: number) => `s${pad(i)}`;
 export default function ReportView({ term }: { term: Term }) {
     const [openGoal, setOpenGoal] = useState<number | null>(null);
     const bodyRef = useRef<HTMLDivElement>(null);
+    const dialogRef = useRef<HTMLDivElement>(null);
 
     const content = getReport(term.slug);
     const goals: Goal[] = content?.sections.flatMap((s) => s.goals ?? []) ?? [];
@@ -70,6 +67,12 @@ export default function ReportView({ term }: { term: Term }) {
     }, [content]);
 
     // Escape closes the dialog
+    // The dialog node is reused when stepping between goals, so it keeps the
+    // previous goal's scroll position — send it back to the top on every change.
+    useEffect(() => {
+        dialogRef.current?.scrollTo({ top: 0 });
+    }, [openGoal]);
+
     useEffect(() => {
         const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpenGoal(null);
         window.addEventListener("keydown", onKey);
@@ -77,7 +80,7 @@ export default function ReportView({ term }: { term: Term }) {
     }, []);
 
     // A term that exists but has no written report yet
-    if (!term.published || !content) {
+    if (!termStatus(term).published || !content) {
         return (
             <main className={styles.page}>
                 <div className={styles.wrap}>
@@ -85,19 +88,19 @@ export default function ReportView({ term }: { term: Term }) {
                         ← Back to reports
                     </Link>
                     <div className={styles.upcoming}>
-                        <div className={styles.upStatus}>{term.status}</div>
+                        <div className={styles.upStatus}>{termStatus(term).label}</div>
                         <h1 className={styles.upTitle}>{term.company}</h1>
                         <p className={styles.upMeta}>
                             {term.code} · {term.range}
                         </p>
-                        <p className={styles.upEmpty}>{term.empty}</p>
+                        <p className={styles.upEmpty}>{PLACEHOLDER}</p>
                     </div>
                 </div>
             </main>
         );
     }
 
-    const g = openGoal !== null ? goals[openGoal] : null;
+    const activeGoal = openGoal !== null ? goals[openGoal] : null;
     const step = (d: number) =>
         setOpenGoal((cur) =>
             cur === null ? null : (cur + d + goals.length) % goals.length
@@ -117,19 +120,14 @@ export default function ReportView({ term }: { term: Term }) {
                         <div
                             className={cx(
                                 styles.badge,
-                                isLogo(term.badge) && styles.hasLogo
+                                term.badge.kind === "logo" && styles.hasLogo
                             )}
                         >
-                            {isLogo(term.badge) ? (
-                                <Image
-                                    src={term.badge}
-                                    alt={`${term.company} logo`}
-                                    width={58}
-                                    height={58}
-                                />
-                            ) : (
-                                term.badge
-                            )}
+                            <BadgeContent
+                                badge={term.badge}
+                                alt={`${term.company} logo`}
+                                size={58}
+                            />
                         </div>
                         <div className={styles.eyebrow}>
                             {content.eyebrow} · {term.range}
@@ -139,8 +137,8 @@ export default function ReportView({ term }: { term: Term }) {
                     <div className={styles.facts}>
                         {content.facts.map((f) => (
                             <div className={styles.fact} key={f.label}>
-                                <div className={styles.fl}>{f.label}</div>
-                                <div className={styles.fv}>{f.value}</div>
+                                <div className={styles.factLabel}>{f.label}</div>
+                                <div className={styles.factValue}>{f.value}</div>
                             </div>
                         ))}
                     </div>
@@ -148,12 +146,12 @@ export default function ReportView({ term }: { term: Term }) {
 
                 <div className={styles.body} ref={bodyRef}>
                     <nav className={styles.contents}>
-                        <div className={styles.cl}>Contents</div>
+                        <div className={styles.contentsLabel}>Contents</div>
                         <ul>
                             {content.sections.map((sec, i) => (
                                 <li key={anchorId(i)}>
                                     <a href={`#${anchorId(i)}`} data-sec={anchorId(i)}>
-                                        <span className={styles.n}>{pad(i)}</span>
+                                        <span className={styles.contentsNum}>{pad(i)}</span>
                                         {sec.title}
                                     </a>
                                 </li>
@@ -182,9 +180,9 @@ export default function ReportView({ term }: { term: Term }) {
                                     <div className={styles.callouts}>
                                         {sec.callouts.map((c) => (
                                             <div className={styles.callout} key={c.label}>
-                                                <div className={styles.cco}>{c.label}</div>
-                                                <div className={styles.ccv}>{c.value}</div>
-                                                <div className={styles.ccd}>{c.detail}</div>
+                                                <div className={styles.calloutLabel}>{c.label}</div>
+                                                <div className={styles.calloutValue}>{c.value}</div>
+                                                <div className={styles.calloutDetail}>{c.detail}</div>
                                             </div>
                                         ))}
                                     </div>
@@ -250,14 +248,14 @@ export default function ReportView({ term }: { term: Term }) {
 
             {/* goal dialog */}
             <div
-                className={cx(styles.backdrop, g && styles.open)}
+                className={cx(styles.backdrop, activeGoal && styles.open)}
                 onClick={(e) => e.target === e.currentTarget && setOpenGoal(null)}
             >
-                {g && openGoal !== null && (
-                    <div className={styles.dialog} role="dialog" aria-modal="true">
+                {activeGoal && openGoal !== null && (
+                    <div ref={dialogRef} className={styles.dialog} role="dialog" aria-modal="true">
                         <div className={styles.dgTop}>
                             <div className={styles.dgTag}>
-                                Goal {pad(openGoal)} of {pad(goals.length - 1)} · {g.status}
+                                Goal {pad(openGoal)} of {pad(goals.length - 1)} · {activeGoal.status}
                             </div>
                             <button
                                 type="button"
@@ -268,22 +266,22 @@ export default function ReportView({ term }: { term: Term }) {
                                 ✕
                             </button>
                         </div>
-                        <h3>{g.title}</h3>
+                        <h3>{activeGoal.title}</h3>
                         <div className={styles.dgBlock}>
-                            <div className={styles.bl}>Goal</div>
-                            <p>{g.goal}</p>
+                            <div className={styles.blockLabel}>Goal</div>
+                            <p>{activeGoal.goal}</p>
                         </div>
                         <div className={styles.dgBlock}>
-                            <div className={styles.bl}>Action plan</div>
-                            <p>{g.actions}</p>
+                            <div className={styles.blockLabel}>Action plan</div>
+                            <p>{activeGoal.actions}</p>
                         </div>
                         <div className={styles.dgBlock}>
-                            <div className={styles.bl}>Measure of Success</div>
-                            <p>{g.measure}</p>
+                            <div className={styles.blockLabel}>Measure of Success</div>
+                            <p>{activeGoal.measure}</p>
                         </div>
                         <div className={styles.dgBlock}>
-                            <div className={styles.bl}>Reflection</div>
-                            <p>{g.reflection}</p>
+                            <div className={styles.blockLabel}>Reflection</div>
+                            <p>{activeGoal.reflection}</p>
                         </div>
                         <div className={styles.dgNav}>
                             <button

@@ -2,8 +2,8 @@
 
 import { useLayoutEffect, useRef, useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
-import { terms, type Term } from "@/data/terms";
+import { terms, termStatus, PLACEHOLDER, type Term } from "@/data/terms";
+import { BadgeContent } from "@/components/badge";
 import styles from "./page.module.css";
 
 //helper to join class names conditionally
@@ -17,30 +17,9 @@ const stateClass: Record<Term["state"], string> = {
     Future: styles.future,
 };
 
-// Term.status -> optional colour modifier for the status line.
-const statusClass: Record<Term["status"], string | undefined> = {
-    Completed: undefined,
-    "In Progress": undefined,
-    Upcoming: styles.up,
-};
-
-// `badge` carries either a public-path logo ("/logos/x.png") or a short literal
-// to typeset ("-" for terms whose employer isn't known yet).
-const isLogo = (badge: string) => badge.startsWith("/");
-
-function BadgeContent({ term }: { term: Term }) {
-    if (isLogo(term.badge)) {
-        return (
-            <Image
-                src={term.badge}
-                alt={`${term.company} logo`}
-                width={64}
-                height={64}
-            />
-        );
-    }
-    return <>{term.badge}</>;
-}
+// A term that hasn't started yet tints the status line; the others keep the default colour.
+const statusClass = (state: Term["state"]) =>
+    state === "Future" ? styles.up : undefined;
 
 export default function Home() {
     const [selected, setSelected] = useState(0);
@@ -156,22 +135,26 @@ export default function Home() {
                     <div
                         className={cx(
                             styles.dBadge,
-                            isLogo(term.badge)
+                            term.badge.kind === "logo"
                                 ? styles.hasLogo
-                                : !term.published && styles.muted
+                                : !termStatus(term).published && styles.muted
                         )}
                     >
-                        <BadgeContent term={term} />
+                        <BadgeContent
+                            badge={term.badge}
+                            alt={`${term.company} logo`}
+                            size={64}
+                        />
                     </div>
                     <div className={styles.dMain}>
-                        <div className={cx(styles.dStatus, statusClass[term.status])}>
-                            {term.status}
+                        <div className={cx(styles.dStatus, statusClass(term.state))}>
+                            {termStatus(term).label}
                         </div>
                         <h2>{term.company}</h2>
                         <div className={styles.dMeta}>
                             {term.code} · {term.range}
                         </div>
-                        {term.published ? (
+                        {termStatus(term).published ? (
                             <>
                                 <p className={styles.dRole}>{term.role}</p>
                                 <div className={styles.dTags}>
@@ -181,23 +164,17 @@ export default function Home() {
                                 </div>
                             </>
                         ) : (
-                            <p className={styles.dEmpty}>{term.empty}</p>
+                            <p className={styles.dEmpty}>{PLACEHOLDER}</p>
                         )}
                     </div>
-                    {term.published && (
+                    {termStatus(term).published && (
                         <div className={styles.dActions}>
                             <Link
                                 href={`/reports/${term.slug}`}
-                                className={cx(styles.btn, styles.btnPrimary)}
+                                className={cx(styles.btn, styles.btnPrimary, styles.cardLink)}
                             >
                                 Read report
                             </Link>
-                            <button
-                                type="button"
-                                className={cx(styles.btn, styles.btnGhost)}
-                            >
-                                Download PDF
-                            </button>
                         </div>
                     )}
                 </div>

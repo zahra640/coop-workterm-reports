@@ -45,8 +45,8 @@
 .fact { padding: 16px 18px; border-bottom: 1px solid var(--line); }
 .fact:nth-child(odd) { border-right: 1px solid var(--line); }
 .fact:nth-last-child(-n + 2) { border-bottom: none; }
-.fl { color: var(--soft); font-size: 12px; }
-.fv { font-family: var(--disp), serif; font-weight: 600; font-size: 17px; margin-top: 2px; }
+.factLabel { color: var(--soft); font-size: 12px; }
+.factValue { font-family: var(--disp), serif; font-weight: 600; font-size: 17px; margin-top: 2px; }
 
 /* ---------- body: contents + sections ---------- */
 .body {
@@ -57,7 +57,7 @@
     align-items: start;
 }
 .contents { position: sticky; top: 82px; }
-.cl {
+.contentsLabel {
     color: var(--soft); font-size: 12px; font-weight: 600;
     text-transform: uppercase; letter-spacing: .08em; margin-bottom: 14px;
 }
@@ -69,14 +69,14 @@
     border-left: 2px solid var(--line);
     transition: .2s var(--ease);
 }
-.contents a .n { color: var(--faint); font-family: var(--disp), serif; font-size: 13px; }
+.contents a .contentsNum { color: var(--faint); font-family: var(--disp), serif; font-size: 13px; }
 .contents a:hover { color: var(--pine); }
 .contents a.on {
     color: var(--pine);
     border-left-color: var(--pine);
     transform: translateX(2px);
 }
-.contents a.on .n { color: var(--pine); }
+.contents a.on .contentsNum { color: var(--pine); }
 
 /* scroll reveal */
 .sec {
@@ -97,9 +97,9 @@
 /* callouts */
 .callouts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 22px 0; }
 .callout { background: var(--panel); border: 1px solid var(--line); border-radius: 15px; padding: 18px; }
-.cco { color: var(--pine); font-size: 12px; font-weight: 600; }
-.ccv { font-family: var(--disp), serif; font-weight: 600; font-size: 18px; margin: 6px 0 4px; }
-.ccd { font-size: 13.5px; color: var(--soft); line-height: 1.45; }
+.calloutLabel { color: var(--pine); font-size: 12px; font-weight: 600; }
+.calloutValue { font-family: var(--disp), serif; font-weight: 600; font-size: 18px; margin: 6px 0 4px; }
+.calloutDetail { font-size: 13.5px; color: var(--soft); line-height: 1.45; }
 
 /* goal cards */
 .goals { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-top: 22px; }
@@ -178,7 +178,7 @@
 .dgClose:hover { background: var(--pine-t); color: var(--pine); }
 .dialog h3 { font-family: var(--disp), serif; font-size: 27px; margin: 4px 0 20px; }
 .dgBlock { margin-bottom: 16px; }
-.bl {
+.blockLabel {
     color: var(--pine); font-size: 12px; font-weight: 600; margin-bottom: 4px;
     text-transform: uppercase; letter-spacing: .06em;
 }

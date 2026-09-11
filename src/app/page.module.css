@@ -143,6 +143,8 @@
 /* ---------- detail panel ---------- */
 @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
 .detail {
+    /* Positioning context for .cardLink's stretched-link overlay below. */
+    position: relative;
     background: var(--panel);
     border: 1px solid var(--line);
     border-radius: 20px;
@@ -155,6 +157,7 @@
     gap: 30px;
     align-items: center;
     animation: fade .4s var(--ease);
+    /* Anchor for the stretched link below. */
 }
 .dBadge {
     flex: none;
@@ -206,6 +209,7 @@
 .btnPrimary:hover { background: var(--pine-d); transform: translateY(-2px); }
 .btnGhost { color: var(--pine); border-color: var(--line); background: transparent; }
 .btnGhost:hover { background: var(--pine-t); border-color: var(--pine-t); }
+
 
 /* ---------- responsive ---------- */
 @media (max-width: 840px) {

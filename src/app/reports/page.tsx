@@ -1,22 +1,28 @@
 // src/app/reports/page.tsx
 import Link from "next/link";
-import Image from "next/image";
-import { terms } from "@/data/terms";
+import {
+    terms,
+    termStatus,
+    PLACEHOLDER,
+    type Badge as BadgeValue,
+} from "@/data/terms";
+import { BadgeContent } from "@/components/badge";
 import styles from "./page.module.css";
 
 const cx = (...c: (string | false | undefined)[]) => c.filter(Boolean).join(" ");
 
-// Renders a logo image when badge is a path ("/logos/x.png"),
-// otherwise falls back to the text (initials or "—").
-function Badge({ badge, muted }: { badge?: string; muted?: boolean }) {
-    const isImage = badge?.startsWith("/");
+function Badge({
+                   badge,
+                   company,
+                   muted,
+               }: {
+    badge: BadgeValue;
+    company: string;
+    muted?: boolean;
+}) {
     return (
         <div className={cx(styles.badge, muted && styles.badgeMuted)}>
-            {isImage ? (
-                <Image src={badge!} alt="" width={48} height={48} />
-            ) : (
-                <span>{badge ?? "—"}</span>
-            )}
+            <BadgeContent badge={badge} alt={`${company} logo`} size={48} />
         </div>
     );
 }
@@ -29,9 +35,9 @@ export default function ReportsIndex() {
 
                 <div className={styles.grid}>
                     {terms.map((t) =>
-                        t.published ? (
+                        termStatus(t).published ? (
                             <Link key={t.slug} href={`/reports/${t.slug}`} className={styles.card}>
-                                <Badge badge={t.badge} />
+                                <Badge badge={t.badge} company={t.company} />
                                 <div className={styles.meta}>
                                     {t.code} · {t.range}
                                 </div>
@@ -46,13 +52,13 @@ export default function ReportsIndex() {
                             </Link>
                         ) : (
                             <div key={t.slug} className={cx(styles.card, styles.up)}>
-                                <Badge badge={t.badge} muted />
+                                <Badge badge={t.badge} company={t.company} muted />
                                 <div className={styles.meta}>
                                     {t.code} · {t.range}
                                 </div>
                                 <h2 className={cx(styles.co, styles.coMuted)}>{t.company}</h2>
-                                <p className={styles.empty}>{t.empty}</p>
-                                <span className={styles.status}>{t.status}</span>
+                                <p className={styles.empty}>{PLACEHOLDER}</p>
+                                <span className={styles.status}>{termStatus(t).label}</span>
                             </div>
                         )
                     )}

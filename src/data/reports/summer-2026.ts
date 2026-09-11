@@ -1,8 +1,4 @@
 // Work term 01 — Vehikl, Summer 2026.
-//
-// To add a report: copy this file, rename it after the term, change the words,
-// then register it in ./index.ts. Nothing else needs touching — section numbers,
-// anchor ids and goal numbers all come from array order.
 
 import type { ReportContent } from "./types";
 
@@ -29,23 +25,6 @@ const summer2026: ReportContent = {
             paragraphs: [
                 "Vehikl is a software consultancy company that designs, develops, and maintains software for clients across different industries. As a consultancy, developers have the opportunity to work on a variety of projects and technology stacks. One of the most distinctive parts of vehicle culture is its use of Mob Programming, allowing team members to work collaboratively on tasks, discuss implementation decisions, and learn from one another throughout the process. Vehikl also places a strong emphasis on continuous learning and knowledge sharing through daily growth sessions, monthly lightning talks, book clubs, and other opportunities for professional development. These practices allowed me to build my technical  skills as well as collaborative and problem solving skills that are important in a professional software engineering environment.",
             ],
-            // callouts: [
-            //     {
-            //         label: "Model",
-            //         value: "Client consultancy",
-            //         detail: "Project teams, not product silos.",
-            //     },
-            //     {
-            //         label: "Practice",
-            //         value: "Pairing by default",
-            //         detail: "Most code written with a second person present.",
-            //     },
-            //     {
-            //         label: "My team",
-            //         value: "Four developers",
-            //         detail: "Two seniors, one intermediate, me.",
-            //     },
-            // ],
         },
         {
             title: "Goals",
@@ -72,8 +51,8 @@ const summer2026: ReportContent = {
                 },
                 {
                     //goal 2
-                    status: "In Progress",
-                    met: "partial",
+                    status: "Met",
+                    met: "met",
                     title: "Becoming a Trusted Contributor",
                     teaser: "Growing my craftsmanship, problem-solving, and independence to contribute meaningfully to production software.",
                     goal: "Become a trusted contributor on a client team by developing the technical skills, problem-solving ability, and independence needed to contribute to production software.",
