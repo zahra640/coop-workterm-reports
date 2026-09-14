@@ -67,7 +67,7 @@ export const terms: Term[] = [
     },
     {
         slug: "Winter-2027",
-        code: "W26",
+        code: "W27",
         range: "Jan-Apr 2027",
         badge: { kind: "logo", src: "/logos/vehiklLogo.png" },
         company: "Vehikl",
