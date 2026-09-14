@@ -111,14 +111,14 @@ const summer2026: ReportContent = {
         },
         {
             title: "Tech stack",
-            paragraphs: ["What I actually touched, and how deep I got with each."],
+            paragraphs: ["What I have used, and how much I used each."],
             table: {
                 columns: ["Tool", "Where I used it", "Depth"],
                 rows: [
                     ["Laravel", "Core backend, REST endpoints, queued jobs", "Daily"],
-                    ["Vue 3", "Frontend inside an existing design system", "Weekly"],
+                    ["Vue", "Frontend inside an existing design system", "Weekly"],
                     ["Pest", "Test-first on nearly every ticket", "Daily"],
-                    ["MySQL", "Eloquent, migrations, a few raw queries", "Weekly"],
+                    ["MySQL", "Eloquent, migrations, SQL queries", "Weekly"],
                 ],
             },
         },

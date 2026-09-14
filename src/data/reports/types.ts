@@ -1,9 +1,4 @@
 // Shape of a single work-term report's content.
-//
-// Everything here is words only — no numbering, no ids, no markup. Section
-// numbers ("01"), anchor ids ("s01") and goal numbers are all derived from
-// array order when the report renders, so adding or reordering a section
-// never means renumbering anything by hand.
 
 export type Goal = {
     /** Short label on the pill, e.g. "Met" or "Partly met". */
@@ -20,7 +15,7 @@ export type Goal = {
     reflection: string;
 };
 
-/** The three-up cards used in "The employer". */
+/** The cards used optionally in "The employer". */
 export type Callout = {
     label: string;
     value: string;
