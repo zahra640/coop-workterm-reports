@@ -1,0 +1,226 @@
+/* src/app/page.module.css
+   Page-specific styles for the index / horizontal track.
+   Scoped to this page — reference in JSX as styles.className. */
+
+.page { padding: 24px 0 80px; }
+
+.wrap { max-width: 1080px; margin: 0 auto; padding: 0 34px; }
+
+/* ---------- entrance ---------- */
+@keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+.anim { opacity: 0; animation: rise .7s var(--ease) forwards; }
+.d1 { animation-delay: .05s; }
+.d2 { animation-delay: .13s; }
+.d3 { animation-delay: .21s; }
+.d4 { animation-delay: .30s; }
+
+/* ---------- hero ---------- */
+.eyebrow {
+    font-family: var(--disp), serif;
+    font-style: italic;
+    font-size: 19px;
+    color: var(--pine);
+    margin: 0 0 12px;
+}
+.heroH1 { font-size: 58px; line-height: 1.03; max-width: 20ch; }
+.heroDek { max-width: 56ch; color: var(--soft); font-size: 18px; margin-top: 18px; }
+
+/* ---------- horizontal track ---------- */
+.trackScroll {
+    margin-top: 56px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding-bottom: 6px;
+}
+/* The rail is absolutely positioned against this box, and bullet offsets are
+   measured relative to it — keep it the only positioned ancestor in the track. */
+.trackH { position: relative; min-width: 660px; padding: 10px 20px 0; }
+
+.rail, .railFill {
+    position: absolute;
+    height: 2px;
+    border-radius: 2px;
+    pointer-events: none;
+}
+.rail {
+    background: var(--line);
+    transform: scaleX(0);
+    transform-origin: left;
+    animation: railDraw .9s var(--ease) .2s forwards;
+}
+@keyframes railDraw { to { transform: scaleX(1); } }
+.railFill {
+    background: var(--pine);
+    transition: width .6s var(--ease) .9s;
+}
+
+.nodes { display: flex; align-items: flex-start; position: relative; z-index: 2; }
+
+@keyframes nodePop {
+    from { opacity: 0; transform: translateY(10px) scale(.6); }
+    to   { opacity: 1; transform: none; }
+}
+.node {
+    flex: 1 1 0;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    cursor: pointer;
+    text-align: center;
+    /* reset UA button styling so <button> nodes align with the <div> node */
+    margin: 0;
+    padding: 0;
+    background: none;
+    border: none;
+    font: inherit;
+    color: inherit;
+    opacity: 0;
+    animation: nodePop .5s var(--ease) forwards;
+}
+
+.bullet {
+    flex: none;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--bg);
+    border: 2px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: .25s var(--ease);
+}
+.bullet i {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: transparent;
+    transition: .25s;
+}
+
+.done .bullet { border-color: var(--pine); }
+.done .bullet i { background: var(--pine); }
+
+.current .bullet { border-color: var(--pine); }
+.current .bullet i { background: var(--pine); }
+
+@keyframes ring {
+    0%   { box-shadow: 0 0 0 0 rgba(15,111,99,.4); }
+    70%  { box-shadow: 0 0 0 12px rgba(15,111,99,0); }
+    100% { box-shadow: 0 0 0 0 rgba(15,111,99,0); }
+}
+.active .bullet {
+    border-color: var(--pine);
+    transform: scale(1.25);
+    animation: ring 2.4s ease-out infinite;
+}
+.active .bullet i { background: var(--pine); }
+
+/* Label block: fixed leading so every node's first line sits on one baseline. */
+.lab { display: block; width: 100%; }
+.lab .code {
+    display: block;
+    font-family: var(--disp), serif;
+    font-weight: 600;
+    font-size: 18px;
+    line-height: 1.2;
+    white-space: nowrap;
+}
+.lab .rng {
+    display: block;
+    font-size: 12px;
+    line-height: 1.35;
+    color: var(--faint);
+    margin-top: 3px;
+    white-space: nowrap;
+}
+.future .code { color: var(--faint); }
+.node:hover .code { color: var(--pine); }
+.future:hover .code { color: var(--soft); }
+
+/* ---------- detail panel ---------- */
+@keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+.detail {
+    /* Positioning context for .cardLink's stretched-link overlay below. */
+    position: relative;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    padding: 34px 36px;
+    box-shadow: 0 1px 3px rgba(22,24,31,.05);
+    margin-top: 44px;
+    min-height: 220px;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: 30px;
+    align-items: center;
+    animation: fade .4s var(--ease);
+    /* Anchor for the stretched link below. */
+}
+.dBadge {
+    flex: none;
+    width: 64px; height: 64px;
+    border-radius: 18px;
+    background: var(--pine);
+    color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--disp), serif; font-weight: 600; font-size: 23px;
+    line-height: 1;
+    letter-spacing: .01em;
+    overflow: hidden;
+}
+.dBadge.muted { background: #eef0f2; color: var(--faint); }
+
+/* A logo fills the square edge to edge — the rounded corners come from the
+   parent's overflow, so no pine or grey ground is left showing around it. */
+.dBadge.hasLogo { background: none; padding: 0; }
+.dBadge img { display: block; width: 100%; height: 100%; object-fit: cover; }
+
+.dMain { min-width: 0; }
+.dStatus { font-size: 13px; font-weight: 600; color: var(--pine); margin-bottom: 6px; }
+.dStatus.up { color: var(--amber); }
+.detail h2 { font-size: 32px; margin-bottom: 6px; }
+.dMeta { color: var(--soft); font-size: 14px; margin-bottom: 14px; }
+.dRole { font-size: 16px; color: var(--ink); max-width: 52ch; margin: 0; }
+.dTags { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+.dTags span {
+    font-size: 12px; font-weight: 600;
+    color: var(--pine); background: var(--pine-t);
+    padding: 5px 12px; border-radius: 999px;
+}
+.dEmpty {
+    color: var(--soft); font-style: italic;
+    font-family: var(--disp), serif; font-size: 17px; line-height: 1.5; max-width: 48ch;
+    margin: 0;
+}
+.dActions { display: flex; flex-direction: column; gap: 10px; align-self: center; }
+
+.btn {
+    display: block;
+    font: inherit;
+    font-weight: 600; font-size: 15px;
+    padding: 12px 22px; border-radius: 12px;
+    transition: .2s var(--ease); white-space: nowrap;
+    text-align: center; cursor: pointer; border: 1px solid transparent;
+}
+.btnPrimary { background: var(--pine); color: #fff; }
+.btnPrimary:hover { background: var(--pine-d); transform: translateY(-2px); }
+.btnGhost { color: var(--pine); border-color: var(--line); background: transparent; }
+.btnGhost:hover { background: var(--pine-t); border-color: var(--pine-t); }
+
+
+/* ---------- responsive ---------- */
+@media (max-width: 840px) {
+    .wrap { padding: 0 22px; }
+    .heroH1 { font-size: 42px; }
+    .detail {
+        grid-template-columns: auto minmax(0, 1fr);
+        gap: 20px 24px;
+        padding: 28px 24px;
+        align-items: start;
+    }
+    .dActions { grid-column: 1 / -1; flex-direction: row; flex-wrap: wrap; }
+    .btn { flex: 1 1 auto; }
+}
