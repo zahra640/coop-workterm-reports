@@ -6,6 +6,8 @@ This is the site where I publish my co-op work term reports.
 There is one report per term, that is written up after each
 placement ends.
 
+https://zahra-h.vercel.app/
+
 ## Terms
 
 | Term | Dates | Company | Status |
